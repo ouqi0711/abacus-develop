@@ -8,7 +8,6 @@ namespace ModuleBase
 //
 //DESCRIPTION:
 //   A class to treat Cardinal B-spline interpolation.
-//   qianrui created 2021-09-14
 //MATH:
 //   Only uniform nodes are considered: xm-x[m-1]=Dx(>= 0) for control node: X={x0,x1,...,xm};
 //   Any function p(x) can be written by
@@ -20,15 +19,16 @@ namespace ModuleBase
 //      M_ik(x)=  ---------*M_i(k-1)(x)+ ----------------*M_[i+1][k-1](x)  ( xi <= x <= x[i+1] )
 //                x[i+k]-xi               x[i+k+1]-x[i+1]
 //   For uniform nodes: M_[i+1]k(x+Dx)=M_ik(x)
-//   If we define Bk[n] stores M_ik(x+n*Dx) for x in (xi,xi+Dx):
+//   If we define Bk(n) stores M_ik(x+n*Dx) for x in (xi,xi+Dx):
 //               x+n*Dx-xi               xi+(k-n+1)*Dx-x
 //      Bk[n] = -----------*B(k-1)[n] + -----------------*B(k-1)[n-1]
 //                 k*Dx                        k*Dx
 //USAGE：
 //   ModuleBase::Bspline bp;
-//   bp.init(10,0.7,2); //Dx = 0.7, xi = 2
-//   bp.getbslpine(0.5); //x = 0.5
-//   cout<<bp.bspline_ele(3)<<endl; //print M_ik[xi+3*Dx+x]: M_i[10](4.6) 
+//   bp.init(10,2,0.5); //Dx = 2, xi = 0.5
+//   bp.getbslpine(1.1); //x = 1.1
+//   cout<<bp.bspline_ele(3)<<endl; //print M_ik(xi+3*Dx+x): M_i[10](7.6) 
+//AUTHOR: qianrui on 2021-9-24
 //
 class Bspline
 {
@@ -43,7 +43,7 @@ class Bspline
         ~Bspline();
 
         //Init norder, Dx, xi
-        void init(int norderin, double Dxin, double xiin);
+        void init(const int norderin, const double Dxin = 1, const double xiin = 0);
 
         //delete[] bezier
         void cleanp();
