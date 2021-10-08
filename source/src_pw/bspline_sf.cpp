@@ -104,6 +104,7 @@ void PW_Basis::bspline_sf(const int norder)
     return;
 }
 
+//get coefficients b1, b2, b3
 void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, const int norder)
 {
     const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
