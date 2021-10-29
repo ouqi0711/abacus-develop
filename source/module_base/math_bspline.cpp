@@ -16,7 +16,7 @@ namespace ModuleBase
         if(bezier!=NULL) delete[] bezier;
     }
 
-    void Bspline::init(int norderin, double Dxin, double xiin)
+    void Bspline::init(const int norderin, const double Dxin, const double xiin)
     {
         this->xi = xiin;
         this->Dx = Dxin;

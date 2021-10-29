@@ -7,12 +7,12 @@
 //DESCRIPTION:
 //    Calculate structure factor with Cardinal B-spline interpolation
 //    Ref: J. Chem. Phys. 103, 8577 (1995)
-//    qianrui create 2021-9-17
 //INPUT LIST:
 //    norder: the order of Cardinal B-spline base functions
 //FURTHER OPTIMIZATION:
 //    1. Use "r2c" fft
 //    2. Add parallel algorithm for fftw or na loop
+//AUTHOR: qianrui on 2021-9-24
 //
 void PW_Basis::bspline_sf(const int norder)
 {
@@ -104,6 +104,7 @@ void PW_Basis::bspline_sf(const int norder)
     return;
 }
 
+//get coefficients b1, b2, b3
 void PW_Basis:: bsplinecoef(complex<double> *b1, complex<double> *b2, complex<double> *b3, const int norder)
 {
     const std::complex<double> ci_tpi = ModuleBase::NEG_IMAG_UNIT * ModuleBase::TWO_PI;
