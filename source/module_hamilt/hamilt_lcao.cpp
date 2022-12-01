@@ -24,11 +24,6 @@
 
 namespace hamilt
 {
-// case for nspin<4, gamma-only k-point
-template class HamiltLCAO<double>;
-// case for nspin<4, multi-k-points
-// case for nspin == 4, non-collinear spin case
-template class HamiltLCAO<std::complex<double>>;
 
 template<typename T>
 HamiltLCAO<T>::HamiltLCAO(
@@ -54,9 +49,9 @@ HamiltLCAO<T>::HamiltLCAO(
         &(LM_in->Sloc)
     );
 
-    // kinetic term (<psi|T|psi>), 
+    // kinetic term (<psi|T|psi>),
     // in Gamma_only case, target HR is LCAO_Matrix::Hloc_fixed, while target HK is LCAO_Matrix::Hloc
-    // LCAO_Matrix::Hloc_fixed2 is used for storing 
+    // LCAO_Matrix::Hloc_fixed2 is used for storing
     if(GlobalV::T_IN_H)
     {
         Operator<double>* ekinetic = new Ekinetic<OperatorLCAO<double>>(
@@ -107,6 +102,7 @@ HamiltLCAO<T>::HamiltLCAO(
         {
             pot_register_in.push_back("gatefield");
         }
+        pot_register_in.push_back("tddft");
         //only Potential is not empty, Veff and Meta are available
         if(pot_register_in.size()>0)
         {
@@ -143,16 +139,6 @@ HamiltLCAO<T>::HamiltLCAO(
         this->opsd->add(exx);
     }
 
-    if (GlobalV::dft_plus_u)
-    {
-        Operator<double>* dftu = new OperatorDFTU<OperatorLCAO<double>>(
-            LM_in,
-            nullptr,// no explicit call yet
-            &(LM_in->Hloc)
-        );
-        this->opsd->add(dftu);
-    }
-
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
@@ -165,6 +151,17 @@ HamiltLCAO<T>::HamiltLCAO(
         this->opsd->add(deepks);
     }
 #endif
+
+    //end node should be OperatorDFTU
+    if (GlobalV::dft_plus_u)
+    {
+        Operator<double>* dftu = new OperatorDFTU<OperatorLCAO<double>>(
+            LM_in,
+            nullptr,// no explicit call yet
+            &(LM_in->Hloc)
+        );
+        this->opsd->add(dftu);
+    }
     return;
 }
 
@@ -177,7 +174,7 @@ HamiltLCAO<T>::HamiltLCAO(
     elecstate::Potential* pot_in)
 {
     this->classname = "HamiltLCAO";
-    
+
     //reset fixed Hamiltonian matrix in real space
     LM_in->zeros_HSR('T');
     //reset Overlap matrix in real space
@@ -210,6 +207,7 @@ HamiltLCAO<T>::HamiltLCAO(
         {
             pot_register_in.push_back("gatefield");
         }
+        pot_register_in.push_back("tddft");
         //only Potential is not empty, Veff and Meta are available
         if(pot_register_in.size()>0)
         {
@@ -260,7 +258,7 @@ HamiltLCAO<T>::HamiltLCAO(
     );
     this->ops->add(overlap);
 
-    // kinetic term (<psi|T|psi>), 
+    // kinetic term (<psi|T|psi>),
     // in general case, target HR is LCAO_Matrix::Hloc_fixedR, while target HK is LCAO_Matrix::Hloc2
     if(GlobalV::T_IN_H)
     {
@@ -286,16 +284,6 @@ HamiltLCAO<T>::HamiltLCAO(
         this->ops->add(nonlocal);
     }
 
-    if (GlobalV::dft_plus_u)
-    {
-        Operator<std::complex<double>>* dftu = new OperatorDFTU<OperatorLCAO<std::complex<double>>>(
-            LM_in,
-            nullptr,// no explicit call yet
-            &(LM_in->Hloc2)
-        );
-        this->ops->add(dftu);
-    }
-
 #ifdef __DEEPKS
     if (GlobalV::deepks_scf)
     {
@@ -308,6 +296,16 @@ HamiltLCAO<T>::HamiltLCAO(
         this->ops->add(deepks);
     }
 #endif
+    //end node should be OperatorDFTU
+    if (GlobalV::dft_plus_u)
+    {
+        Operator<std::complex<double>>* dftu = new OperatorDFTU<OperatorLCAO<std::complex<double>>>(
+            LM_in,
+            nullptr,// no explicit call yet
+            &(LM_in->Hloc2)
+        );
+        this->ops->add(dftu);
+    }
 
 }
 
@@ -355,4 +353,9 @@ template <> void HamiltLCAO<std::complex<double>>::updateHk(const int ik)
     ModuleBase::timer::tick("HamiltLCAO", "updateHk");
 }
 
+// case for nspin<4, gamma-only k-point
+template class HamiltLCAO<double>;
+// case for nspin<4, multi-k-points
+// case for nspin == 4, non-collinear spin case
+template class HamiltLCAO<std::complex<double>>;
 } // namespace hamilt
