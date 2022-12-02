@@ -417,13 +417,13 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
     }
 
 #ifdef __EXX
-    // add exx
-    // Peize Lin add 2016-12-03
-    GlobalC::en.set_exx();
-
     // Peize Lin add 2020.04.04
     if (XC_Functional::get_func_type() == 4 || XC_Functional::get_func_type() == 5)
     {
+        // add exx
+        // Peize Lin add 2016-12-03
+        GlobalC::en.set_exx();
+
         if (GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish
             && !GlobalC::restart.info_load.restart_exx)
         {
@@ -435,6 +435,10 @@ void ESolver_KS_LCAO::hamilt2density(int istep, int iter, double ethr)
                 GlobalC::exx_lri_complex.cal_exx_elec(this->LOC, *this->LOWF.ParaV);
             GlobalC::restart.info_load.restart_exx = true;
         }
+    }
+    else
+    {
+        GlobalC::en.exx = 0.;
     }
 #endif
 
