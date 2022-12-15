@@ -63,7 +63,7 @@ class Input
     // Wannier functions
     //==========================================================
     bool towannier90; // add by jingan for wannier90
-    std::string NNKP; // add by jingan for wannier90
+    std::string nnkpfile; // add by jingan for wannier90
     std::string wannier_spin; // add by jingan for wannier90
 
     //==========================================================
@@ -95,7 +95,6 @@ class Input
     double nupdown = 0.0;
     double nelec; // total number of electrons
     int lmaxmax;
-    double tot_magnetization;
 
     //==========================================================
     // LCAO parameters
@@ -211,6 +210,7 @@ class Input
     double mixing_beta; // 0 : no_mixing
     int mixing_ndim; // used in Broyden method
     double mixing_gg0; // used in kerker method. mohan add 2014-09-27
+    bool mixing_tau; // whether to mix tau in mgga
 
     //==========================================================
     // potential / charge / wavefunction / energy
@@ -237,6 +237,7 @@ class Input
     int out_proj_band; // projected band structure calculation jiyy add 2022-05-11
     int out_mat_hs; // output H matrix and S matrix in local basis.
     int out_mat_hs2; // LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
+    int out_hs2_interval;
     int out_mat_r; // jingan add 2019-8-14, output r(R) matrix.
     bool out_wfc_lcao; // output the wave functions in local basis.
     bool out_alllog; // output all logs.
@@ -250,7 +251,7 @@ class Input
     bool dos_setemin = false; //true: emin is set
     bool dos_setemax = false; //true: emax is set
 
-    double b_coef; //  pengfei 2014-10-13
+    double dos_sigma; //  pengfei 2014-10-13
 
     //==========================================================
     // two center integrals in LCAO
@@ -351,6 +352,7 @@ class Input
 
     double exx_lambda;
 
+	std::string exx_real_number;
     double exx_pca_threshold;
     double exx_c_threshold;
     double exx_v_threshold;
@@ -403,7 +405,7 @@ class Input
     int *orbital_corr; // which correlated orbitals need corrected ; d:2 ,f:3, do not need correction:-1
     double *hubbard_u; // Hubbard Coulomb interaction parameter U(ev)
     double *hund_j; // Hund exchange parameter J(ev)
-    bool omc; // whether turn on occupation matrix control method or not
+    int omc; // whether turn on occupation matrix control method or not
     bool yukawa_potential; // default:false
     double yukawa_lambda; // default:-1.0, which means we calculate lambda
 
@@ -500,6 +502,8 @@ class Input
 #ifdef __MPI
     void Bcast(void);
 #endif
+
+    int count_ntype(const std::string &fn); // sunliang add 2022-12-06
 
   public:
     template <class T> static void read_value(std::ifstream &ifs, T &var)
