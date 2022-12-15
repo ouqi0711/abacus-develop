@@ -129,7 +129,7 @@ void Input::Default(void)
     orbital_dir = ""; // liuyu add 2021-08-14
     read_file_dir = "auto";
     // pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-    wannier_card = "";
+    wannier_card = "none";
     latname = "none";
     // xiaohui modify 2015-09-15, relax -> scf
     // calculation = "relax";
@@ -142,6 +142,8 @@ void Input::Default(void)
     nbands_sto = 256;
     nbands_istate = 5;
     pw_seed = 1;
+    emin_sto = 0.0;
+    emax_sto = 0.0;
     nche_sto = 100;
     seed_sto = 0;
     bndpar = 1;
@@ -160,7 +162,7 @@ void Input::Default(void)
     berry_phase = false;
     gdir = 3;
     towannier90 = false;
-    NNKP = "seedname.nnkp";
+    nnkpfile = "seedname.nnkp";
     wannier_spin = "up";
     kspacing = 0.0;
     min_dist_coef = 0.2;
@@ -172,7 +174,6 @@ void Input::Default(void)
     nspin = 1;
     nelec = 0.0;
     lmaxmax = 2;
-    tot_magnetization = 0.0;
     //----------------------------------------------------------
     // new function
     //----------------------------------------------------------
@@ -263,6 +264,7 @@ void Input::Default(void)
     mixing_beta = 0.7;
     mixing_ndim = 8;
     mixing_gg0 = 0.00; // used in kerker method. mohan add 2014-09-27
+    mixing_tau = false;
     //----------------------------------------------------------
     // potential / charge / wavefunction / energy
     //----------------------------------------------------------
@@ -293,6 +295,7 @@ void Input::Default(void)
     out_proj_band = 0;
     out_mat_hs = 0;
     out_mat_hs2 = 0; // LiuXh add 2019-07-15
+    out_hs2_interval = 1;
     out_mat_r = 0; // jingan add 2019-8-14
     out_wfc_lcao = false;
     out_alllog = false;
@@ -300,7 +303,7 @@ void Input::Default(void)
     dos_emax_ev = 15; //(ev)
     dos_edelta_ev = 0.01; //(ev)
     dos_scale = 0.01;
-    b_coef = 0.07;
+    dos_sigma = 0.07;
     out_element_info = false;
     //----------------------------------------------------------
     // LCAO
@@ -352,7 +355,6 @@ void Input::Default(void)
     //----------------------------------------------------------
     // exx										//Peize Lin add 2018-06-20
     //----------------------------------------------------------
-
     exx_hybrid_alpha = "default";
     exx_hse_omega = 0.11;
 
@@ -361,6 +363,7 @@ void Input::Default(void)
 
     exx_lambda = 0.3;
 
+	exx_real_number = "default";
     exx_pca_threshold = 0;
     exx_c_threshold = 0;
     exx_v_threshold = 0;
@@ -407,9 +410,9 @@ void Input::Default(void)
     //----------------------------------------------------------			//Fuxiang He add 2016-10-26
     // constrained DFT
     //----------------------------------------------------------
-    GlobalV::ocp = 0;
+    // GlobalV::ocp = 0;
     // ocp_n = 0;
-    GlobalV::ocp_set = "none";
+    // GlobalV::ocp_set = "none";
     // for(int i=0; i<10000; i++)
     // {
     // GlobalV::ocp_kb[i] = 0.0;
@@ -437,7 +440,7 @@ void Input::Default(void)
     yukawa_potential = false;
     yukawa_lambda = -1.0;
     double_counting = 1;
-    omc = false;
+    omc = 0;
     dftu_type = 2;
 
     //==========================================================
@@ -696,7 +699,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("nnkpfile", word) == 0) // add by jingan for wannier90
         {
-            read_value(ifs, NNKP);
+            read_value(ifs, nnkpfile);
         }
         else if (strcmp("wannier_spin", word) == 0) // add by jingan for wannier90
         {
@@ -728,11 +731,6 @@ bool Input::Read(const std::string &fn)
         else if (strcmp("lmaxmax", word) == 0)
         {
             read_value(ifs, lmaxmax);
-        }
-
-        else if (strcmp("tot_magnetization", word) == 0)
-        {
-            read_value(ifs, tot_magnetization);
         }
         //----------------------------------------------------------
         // new function
@@ -1029,6 +1027,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, mixing_gg0);
         }
+        else if (strcmp("mixing_tau", word) == 0)
+        {
+            read_value(ifs, mixing_tau);
+        }
         //----------------------------------------------------------
         // charge / potential / wavefunction
         //----------------------------------------------------------
@@ -1143,6 +1145,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, out_mat_hs2);
         }
+        else if (strcmp("out_hs2_interval", word) == 0)
+        {
+            read_value(ifs, out_hs2_interval);
+        }
         else if (strcmp("out_mat_r", word) == 0)
         {
             read_value(ifs, out_mat_r);
@@ -1179,7 +1185,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("dos_sigma", word) == 0)
         {
-            read_value(ifs, b_coef);
+            read_value(ifs, dos_sigma);
         }
         else if (strcmp("dos_nche", word) == 0)
         {
@@ -1563,6 +1569,10 @@ bool Input::Read(const std::string &fn)
         {
             read_value(ifs, exx_lambda);
         }
+        else if (strcmp("exx_real_number", word) == 0)
+        {
+            read_value(ifs, exx_real_number);
+        }
         else if (strcmp("exx_pca_threshold", word) == 0)
         {
             read_value(ifs, exx_pca_threshold);
@@ -1818,6 +1828,19 @@ bool Input::Read(const std::string &fn)
         {
             break;
         }
+    }
+
+    // sunliang added on 2022-12-06
+    // To check if ntype in INPUT is equal to the atom species in STRU, if ntype is not set in INPUT, we will set it according to STRU.
+    double ntype_stru = this->count_ntype(GlobalV::stru_file);
+    if (this->ntype == 0)
+    {
+        this->ntype = ntype_stru;
+        GlobalV::ofs_running << "ntype in INPUT is 0, and it is automatically set to " << this->ntype << " according to STRU" << std::endl;
+    }
+    else if (this->ntype != ntype_stru)
+    {
+        ModuleBase::WARNING_QUIT("Input", "The ntype in INPUT is not equal to the ntype counted in STRU, check it.");
     }
 
     //----------------------------------------------------------
@@ -2156,6 +2179,13 @@ void Input::Default_2(void) // jiyy add 2019-08-04
         else if (dft_functional == "pbe0" || dft_functional == "hse" || dft_functional == "scan0")
             exx_hybrid_alpha = "0.25";
     }
+    if (exx_real_number == "default")
+    {
+        if (gamma_only)
+            exx_real_number = "1";
+        else
+            exx_real_number = "0";
+    }
     if (exx_ccp_rmesh_times == "default")
     {
         if (dft_functional == "hf" || dft_functional == "pbe0" || dft_functional == "scan0")
@@ -2211,7 +2241,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(berry_phase);
     Parallel_Common::bcast_int(gdir);
     Parallel_Common::bcast_bool(towannier90);
-    Parallel_Common::bcast_string(NNKP);
+    Parallel_Common::bcast_string(nnkpfile);
     Parallel_Common::bcast_string(wannier_spin);
 
     Parallel_Common::bcast_string(dft_functional);
@@ -2220,8 +2250,6 @@ void Input::Bcast()
     Parallel_Common::bcast_double(nelec);
     Parallel_Common::bcast_double(nupdown);
     Parallel_Common::bcast_int(lmaxmax);
-
-    Parallel_Common::bcast_double(tot_magnetization);
 
     Parallel_Common::bcast_string(basis_type); // xiaohui add 2013-09-01
     Parallel_Common::bcast_string(ks_solver); // xiaohui add 2013-09-01
@@ -2300,6 +2328,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double(mixing_beta);
     Parallel_Common::bcast_int(mixing_ndim);
     Parallel_Common::bcast_double(mixing_gg0); // mohan add 2014-09-27
+    Parallel_Common::bcast_bool(mixing_tau);
 
     Parallel_Common::bcast_string(read_file_dir);
     Parallel_Common::bcast_string(init_wfc);
@@ -2342,7 +2371,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(dos_setemin);
     Parallel_Common::bcast_bool(dos_setemax);
     Parallel_Common::bcast_int(dos_nche);
-    Parallel_Common::bcast_double(b_coef);
+    Parallel_Common::bcast_double(dos_sigma);
 
     // mohan add 2009-11-11
     Parallel_Common::bcast_double(lcao_ecut);
@@ -2463,6 +2492,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(exx_separate_loop);
     Parallel_Common::bcast_int(exx_hybrid_step);
     Parallel_Common::bcast_double(exx_lambda);
+    Parallel_Common::bcast_string(exx_real_number);
     Parallel_Common::bcast_double(exx_pca_threshold);
     Parallel_Common::bcast_double(exx_c_threshold);
     Parallel_Common::bcast_double(exx_v_threshold);
@@ -2493,7 +2523,7 @@ void Input::Bcast()
     //-----------------------------------------------------------------------------------
     Parallel_Common::bcast_bool(dft_plus_u);
     Parallel_Common::bcast_bool(yukawa_potential);
-    Parallel_Common::bcast_bool(omc);
+    Parallel_Common::bcast_int(omc);
     Parallel_Common::bcast_int(dftu_type);
     Parallel_Common::bcast_int(double_counting);
     Parallel_Common::bcast_double(yukawa_lambda);
@@ -3197,4 +3227,37 @@ void Input::strtolower(char *sa, char *sb)
         sb[i] = tolower(c);
     }
     sb[len] = '\0';
+}
+
+// Conut how many types of atoms are listed in STRU
+int Input::count_ntype(const std::string &fn)
+{
+	// Only RANK0 core can reach here, because this function is called during Input::Read.
+	assert(GlobalV::MY_RANK == 0); 
+
+	std::ifstream ifa(fn.c_str(), ios::in);
+	if (!ifa)
+	{
+		GlobalV::ofs_warning << fn;
+		ModuleBase::WARNING_QUIT("Input::count_ntype","Can not find the file containing atom positions.!");
+	}
+
+	int ntype_stru = 0;
+	std::string temp;
+	if( ModuleBase::GlobalFunc::SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
+	{
+		while(true)
+		{
+			ModuleBase::GlobalFunc::READ_VALUE(ifa, temp);
+			if (temp == "LATTICE_CONSTANT" || temp == "NUMERICAL_ORBITAL" || temp == "NUMERICAL_DESCRIPTOR")
+			{
+				break;
+			}
+			else if (isalpha(temp[0]))
+			{
+				ntype_stru += 1;
+			}
+		}
+	}
+    return ntype_stru;
 }

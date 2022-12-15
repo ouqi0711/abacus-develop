@@ -432,6 +432,7 @@ void Input_Conv::Convert(void)
         GlobalC::exx_info.info_global.hybrid_step = INPUT.exx_hybrid_step;
         GlobalC::exx_info.info_lip.lambda = INPUT.exx_lambda;
 
+        GlobalC::exx_info.info_ri.real_number = std::stoi(INPUT.exx_real_number);
         GlobalC::exx_info.info_ri.pca_threshold = INPUT.exx_pca_threshold;
         GlobalC::exx_info.info_ri.C_threshold = INPUT.exx_c_threshold;
         GlobalC::exx_info.info_ri.V_threshold = INPUT.exx_v_threshold;
@@ -470,7 +471,8 @@ void Input_Conv::Convert(void)
     GlobalC::CHR_MIX.set_mixing(INPUT.mixing_mode,
                             INPUT.mixing_beta,
                             INPUT.mixing_ndim,
-                            INPUT.mixing_gg0); // mohan modify 2014-09-27, add mixing_gg0
+                            INPUT.mixing_gg0,
+                            INPUT.mixing_tau); // mohan modify 2014-09-27, add mixing_gg0
 
     //----------------------------------------------------------
     // iteration
@@ -499,6 +501,7 @@ void Input_Conv::Convert(void)
     Local_Orbital_Charge::out_dm1 = INPUT.out_dm1;
     hsolver::HSolverLCAO::out_mat_hs = INPUT.out_mat_hs;
     hsolver::HSolverLCAO::out_mat_hsR = INPUT.out_mat_hs2; // LiuXh add 2019-07-16
+    hsolver::HSolverLCAO::out_hsR_interval = INPUT.out_hs2_interval;
     elecstate::ElecStateLCAO::out_wfc_lcao = INPUT.out_wfc_lcao;
     if (INPUT.calculation == "nscf" && !INPUT.towannier90 && !INPUT.berry_phase)
     {
@@ -514,7 +517,7 @@ void Input_Conv::Convert(void)
     GlobalC::en.dos_emax_ev = INPUT.dos_emax_ev;
     GlobalC::en.dos_edelta_ev = INPUT.dos_edelta_ev;
     GlobalC::en.dos_scale = INPUT.dos_scale;
-    GlobalC::en.bcoeff = INPUT.b_coef;
+    GlobalC::en.bcoeff = INPUT.dos_sigma;
 
     //----------------------------------------------------------
     // About LCAO

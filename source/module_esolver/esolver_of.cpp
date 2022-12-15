@@ -52,7 +52,7 @@ void ESolver_OF::Init(Input &inp, UnitCell &ucell)
     ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
-    if (ModuleSymmetry::Symmetry::symm_flag)
+    if (ModuleSymmetry::Symmetry::symm_flag == 1)
     {
         GlobalC::symm.analy_sys(ucell, GlobalV::ofs_running);
         ModuleBase::GlobalFunc::DONE(GlobalV::ofs_running, "SYMMETRY");
@@ -1062,7 +1062,7 @@ void ESolver_OF::cal_Energy(double& etot)
 
 void ESolver_OF::cal_Force(ModuleBase::matrix& force)
 {
-    Forces ff;
+    Forces<double> ff;
     ModuleBase::matrix placeholder_wg;//using a placeholder for this template interface, would be refactor later
     ff.init(force, placeholder_wg, pelec->charge);
 }
