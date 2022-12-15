@@ -16,25 +16,26 @@ void LCAO_Deepks::cal_o_delta(const std::vector<std::vector<ModuleBase::matrix>>
 {
     ModuleBase::TITLE("LCAO_Deepks", "cal_o_delta");
     this->o_delta.zero_out();
-    for (int i = 0; i < GlobalV::NLOCAL; ++i)
+    for (int hl = 0; hl < 2; ++hl)
     {
-        for (int j = 0; j < GlobalV::NLOCAL; ++j)
+        for (int i = 0; i < GlobalV::NLOCAL; ++i)
         {
-            const int mu = ParaO.trace_loc_row[j];
-            const int nu = ParaO.trace_loc_col[i];
+            for (int j = 0; j < GlobalV::NLOCAL; ++j)
+            {
+                const int mu = ParaO.trace_loc_row[j];
+                const int nu = ParaO.trace_loc_col[i];
             
-            if (mu >= 0 && nu >= 0)
-            {                
-                const int index = nu*ParaO.nrow + mu;   
-                for (int is = 0; is < GlobalV::NSPIN; ++is)
-                {
-                    for (int hl = 0; hl < 2; ++hl)
+                if (mu >= 0 && nu >= 0)
+                {                
+                    const int index = nu*ParaO.nrow + mu;   
+                    for (int is = 0; is < GlobalV::NSPIN; ++is)
                     {
                         this->o_delta(0,hl) += dm_hl[hl][is](nu, mu) * this->H_V_delta[index];
                     }
                 }
             }
         }
+        Parallel_Reduce::reduce_double_all(this->o_delta(0,hl));
     }
     return;
 }

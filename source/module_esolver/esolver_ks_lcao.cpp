@@ -736,18 +736,18 @@ void ESolver_KS_LCAO::afterscf(const int istep)
                     std::vector<std::vector<ModuleBase::ComplexMatrix>> dm_bandgap_k;
                     dm_bandgap_k.resize(2);
 
-                    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
+                    for (int ib = 0; ib < 2; ib++)
                     {
-                        for (int ib = 0; ib < 2; ib++)
+                        wg_hl.zero_out();
+                        for (int ik = 0; ik < GlobalC::kv.nks; ik++)
                         {
-                            wg_hl.zero_out();
                             wg_hl(ik, ib+nocc-1) = 1.0;
-                            dm_bandgap_k[ib].resize(GlobalC::kv.nks);
-                            elecstate::cal_dm(this->LOWF.ParaV, wg_hl, this->psi[0], dm_bandgap_k[ib]);
                         }
+                        dm_bandgap_k[ib].resize(GlobalC::kv.nks);
+                        elecstate::cal_dm(this->LOWF.ParaV, wg_hl, this->psi[0], dm_bandgap_k[ib]);
                     }
                     
-                    GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
+                    //GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
                     GlobalC::ld.cal_orbital_precalc_k(dm_bandgap_k,
                                                       GlobalC::ucell.nat,
                                                       GlobalC::kv.nks,
@@ -758,7 +758,7 @@ void ESolver_KS_LCAO::afterscf(const int istep)
                                                       *this->LOWF.ParaV);
                     GlobalC::ld.save_npy_orbital_precalc(GlobalC::ucell.nat,nks);
                     GlobalC::ld.cal_o_delta_k(dm_bandgap_k, *this->LOWF.ParaV, GlobalC::kv.nks);
-                     GlobalC::ld.save_npy_o(deepks_bands - GlobalC::ld.o_delta,"o_base.npy",nks);
+                    GlobalC::ld.save_npy_o(deepks_bands - GlobalC::ld.o_delta,"o_base.npy",nks);
                 } //end deepks_scf multi-k
             } //end deepks_scf == 1
             else //deepks_scf == 0
