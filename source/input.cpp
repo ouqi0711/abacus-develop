@@ -582,7 +582,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("pseudo_mesh", word) == 0) //
         {
-            read_value(ifs, pseudo_mesh);
+            read_bool(ifs, pseudo_mesh);
         }
         else if (strcmp("calculation", word) == 0) // which type calculation
         {
@@ -653,7 +653,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("cal_cond", word) == 0)
         {
-            read_value(ifs, cal_cond);
+            read_bool(ifs, cal_cond);
         }
         else if (strcmp("cond_nche", word) == 0)
         {
@@ -677,7 +677,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("cond_nonlocal", word) == 0)
         {
-            read_value(ifs, cond_nonlocal);
+            read_bool(ifs, cond_nonlocal);
         }
         else if (strcmp("bndpar", word) == 0)
         {
@@ -689,7 +689,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("berry_phase", word) == 0) // berry phase calculation
         {
-            read_value(ifs, berry_phase);
+            read_bool(ifs, berry_phase);
         }
         else if (strcmp("gdir", word) == 0) // berry phase calculation
         {
@@ -697,7 +697,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("towannier90", word) == 0) // add by jingan for wannier90
         {
-            read_value(ifs, towannier90);
+            read_bool(ifs, towannier90);
         }
         else if (strcmp("nnkpfile", word) == 0) // add by jingan for wannier90
         {
@@ -751,7 +751,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("search_pbc", word) == 0)
         {
-            read_value(ifs, search_pbc);
+            read_bool(ifs, search_pbc);
         }
         else if (strcmp("symmetry", word) == 0)
         {
@@ -759,7 +759,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("init_vel", word) == 0)
         {
-            read_value(ifs, init_vel);
+            read_bool(ifs, init_vel);
         }
         else if (strcmp("symmetry_prec", word) == 0) // LiuXh add 2021-08-12, accuracy for symmetry
         {
@@ -771,7 +771,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_force", word) == 0)
         {
-            read_value(ifs, out_force);
+            read_bool(ifs, out_force);
         }
         else if (strcmp("force_thr", word) == 0)
         {
@@ -804,7 +804,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("cal_stress", word) == 0)
         {
-            read_value(ifs, cal_stress);
+            read_bool(ifs, cal_stress);
         }
         else if (strcmp("fixed_axes", word) == 0)
         {
@@ -812,11 +812,11 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("fixed_ibrav", word) == 0)
         {
-            read_value(ifs, fixed_ibrav);
+            read_bool(ifs, fixed_ibrav);
         }
         else if (strcmp("fixed_atoms", word) == 0)
         {
-            read_value(ifs, fixed_atoms);
+            read_bool(ifs, fixed_atoms);
         }
         else if (strcmp("relax_method", word) == 0)
         {
@@ -857,7 +857,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("relax_new", word) == 0)
         {
-            read_value(ifs, relax_new);
+            read_bool(ifs, relax_new);
         }
 
         //----------------------------------------------------------
@@ -865,7 +865,7 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------
         else if (strcmp("gamma_only", word) == 0)
         {
-            read_value(ifs, gamma_only);
+            read_bool(ifs, gamma_only);
         }
         else if (strcmp("ecutwfc", word) == 0)
         {
@@ -1161,15 +1161,15 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_wfc_lcao", word) == 0)
         {
-            read_value(ifs, out_wfc_lcao);
+            read_bool(ifs, out_wfc_lcao);
         }
         else if (strcmp("out_alllog", word) == 0)
         {
-            read_value(ifs, out_alllog);
+            read_bool(ifs, out_alllog);
         }
         else if (strcmp("out_element_info", word) == 0)
         {
-            read_value(ifs, out_element_info);
+            read_bool(ifs, out_element_info);
         }
         else if (strcmp("dos_emin_ev", word) == 0)
         {
@@ -1348,11 +1348,11 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------
         else if (strcmp("efield_flag", word) == 0)
         {
-            read_value(ifs, efield_flag);
+            read_bool(ifs, efield_flag);
         }
         else if (strcmp("dip_cor_flag", word) == 0)
         {
-            read_value(ifs, dip_cor_flag);
+            read_bool(ifs, dip_cor_flag);
         }
         else if (strcmp("efield_dir", word) == 0)
         {
@@ -1376,7 +1376,7 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------
         else if (strcmp("gate_flag", word) == 0)
         {
-            read_value(ifs, gate_flag);
+            read_bool(ifs, gate_flag);
         }
         else if (strcmp("zgate", word) == 0)
         {
@@ -1384,11 +1384,11 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("relax", word) == 0)
         {
-            read_value(ifs, relax);
+            read_bool(ifs, relax);
         }
         else if (strcmp("block", word) == 0)
         {
-            read_value(ifs, block);
+            read_bool(ifs, block);
         }
         else if (strcmp("block_down", word) == 0)
         {
@@ -1484,7 +1484,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("vdw_abc", word) == 0)
         {
-            read_value(ifs, vdw_abc);
+            read_bool(ifs, vdw_abc);
         }
         else if (strcmp("vdw_cutoff_radius", word) == 0)
         {
@@ -1532,11 +1532,11 @@ bool Input::Read(const std::string &fn)
         //--------------------------------------------------------
         else if (strcmp("restart_save", word) == 0)
         {
-            read_value(ifs, restart_save);
+            read_bool(ifs, restart_save);
         }
         else if (strcmp("restart_load", word) == 0)
         {
-            read_value(ifs, restart_load);
+            read_bool(ifs, restart_load);
         }
         else if (strcmp("ocp", word) == 0)
         {
@@ -1565,7 +1565,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("exx_separate_loop", word) == 0)
         {
-            read_value(ifs, exx_separate_loop);
+            read_bool(ifs, exx_separate_loop);
         }
         else if (strcmp("exx_hybrid_step", word) == 0)
         {
@@ -1641,11 +1641,11 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("noncolin", word) == 0)
         {
-            read_value(ifs, noncolin);
+            read_bool(ifs, noncolin);
         }
         else if (strcmp("lspinorb", word) == 0)
         {
-            read_value(ifs, lspinorb);
+            read_bool(ifs, lspinorb);
         }
         else if (strcmp("soc_lambda", word) == 0)
         {
@@ -1657,7 +1657,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("test_skip_ewald", word) == 0)
         {
-            read_value(ifs, test_skip_ewald);
+            read_bool(ifs, test_skip_ewald);
         }
         //--------------
         //----------------------------------------------------------------------------------
@@ -1665,7 +1665,7 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------------------------------
         else if (strcmp("dft_plus_u", word) == 0)
         {
-            ifs >> dft_plus_u;
+            read_bool(ifs, dft_plus_u);
         }
         else if (strcmp("dftu_type", word) == 0)
             ifs.ignore(150, '\n');
@@ -1688,14 +1688,14 @@ bool Input::Read(const std::string &fn)
         //----------------------------------------------------------------------------------
         else if (strcmp("dft_plus_dmft", word) == 0)
         {
-            ifs >> dft_plus_dmft;
+            read_bool(ifs, dft_plus_dmft);
         }
         //----------------------------------------------------------------------------------
         //         Rong Shi added for RPA
         //----------------------------------------------------------------------------------
         else if (strcmp("rpa", word) == 0)
         {
-            read_value(ifs, rpa);
+            read_bool(ifs, rpa);
             if (rpa) GlobalV::rpa_setorb = true;
         }
         //----------------------------------------------------------------------------------
@@ -1766,11 +1766,11 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("of_hold_rho0", word) == 0)
         {
-            read_value(ifs, of_hold_rho0);
+            read_bool(ifs, of_hold_rho0);
         }
         else if (strcmp("of_full_pw", word) == 0)
         {
-            read_value(ifs, of_full_pw);
+            read_bool(ifs, of_full_pw);
         }
         else if (strcmp("of_full_pw_dim", word) == 0)
         {
@@ -1778,7 +1778,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("of_read_kernel", word) == 0)
         {
-            read_value(ifs, of_read_kernel);
+            read_bool(ifs, of_read_kernel);
         }
         else if (strcmp("of_kernel_file", word) == 0)
         {
@@ -1887,7 +1887,7 @@ bool Input::Read(const std::string &fn)
             }
             else if (strcmp("yukawa_potential", word) == 0)
             {
-                ifs >> yukawa_potential;
+            	read_bool(ifs, yukawa_potential);
             }
             else if (strcmp("yukawa_lambda", word) == 0)
             {
@@ -3207,19 +3207,38 @@ void Input::close_log(void) const
     ModuleBase::Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
-void Input::readbool(std::ifstream &ifs, bool &var)
+void Input::read_bool(std::ifstream &ifs, bool &var)
 {
     std::string str;
     ifs >> str;
+    for(auto &i : str)
+    {
+        i = tolower(i);
+    }
     if (str == "true")
     {
         var = true;
     }
-    else
+    else if (str == "false")
     {
         var = false;
     }
-    ifs.ignore(100, '\n');
+    else if (str == "1")
+    {
+        var = true;
+    }
+    else if (str == "0")
+    {
+        var = false;
+    }
+    else
+    {
+        std::string warningstr = "Bad boolean parameter ";
+        warningstr.append(str);
+        warningstr.append(", please check the input parameters in file INPUT");
+        ModuleBase::WARNING_QUIT("Input", warningstr); 
+    }
+    ifs.ignore(150, '\n');
     return;
 }
 
