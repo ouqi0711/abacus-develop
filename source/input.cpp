@@ -2297,6 +2297,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool(out_chg);
     Parallel_Common::bcast_bool(out_dm);
     Parallel_Common::bcast_bool(out_dm1);
+    Parallel_Common::bcast_bool(out_bandgap); //for bandgap printing
 
     Parallel_Common::bcast_bool(deepks_out_labels); // caoyu added 2020-11-24, mohan modified 2021-01-03
     Parallel_Common::bcast_bool(deepks_scf);
