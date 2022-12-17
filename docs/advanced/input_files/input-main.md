@@ -44,10 +44,10 @@
   [td_scf_thr](#td_scf_thr) | [td_dt](#td_dt) | [td_force_dt](#td_force_dt) | [td_vext](#td_vext) | [td_vext_dire](#td_vext_dire) | [td_timescale](#td_timescale) | [td_vexttype](#td_vexttype) | [td_vextout](#td_vextout) | [td_dipoleout](#td_dipoleout) | [ocp](#ocp) | [ocp_set](#ocp_set) | [td_val_elec_01](#td_val_elec_01) | [td_val_elec_02](#td_val_elec_02) |[td_val_elec_03](#td_val_elec_03)
 - [DFT+*U* correction](#dftu-correction) (Under development)
 
-  [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [hund_j](#hund_j) | [yukawa_potential](#yukawa_potential) | [yukawa_lambda](#yukawa_lambda) | [omc](#omc)
+  [dft_plus_u](#dft_plus_u) | [orbital_corr](#orbital_corr) | [hubbard_u](#hubbard_u) | [yukawa_potential](#yukawa_potential) | [yukawa_lambda](#yukawa_lambda) | [omc](#omc)
 - [Variables useful for debugging](#variables-useful-for-debugging)
 
-  [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour) | [test_skip_ewald](#test_skip_ewald)
+  [nurse](#nurse) | [t_in_h](#t_in_h) | [vl_in_h](#vl_in_h) | [vnl_in_h](#vnl_in_h) | [vh_in_h](#vh_in_h) | [vion_in_h](#vion_in_h) | [test_force](#test_force) | [test_stress](#test_stress) | [colour](#colour) | [test_skip_ewald](#test_skip_ewald)
 - [DeePKS](#deepks)
 
   [deepks_out_labels](#deepks_out_labels) | [deepks_scf](#deepks_scf) | [deepks_model](#deepks_model) | [bessel_lmax](#bessel_lmax) | [bessel_rcut](#bessel_rcut) | [bessel_tol](#bessel_tol) | [deepks_bandgap](#deepks_bandgap) | [deepks_out_unittest](#deepks_out_unittest)
@@ -675,6 +675,7 @@ These variables are used to control the geometry relaxation.
 
 ### cal_force
 
+- **Type**: Boolean
 - **Description**: If set to 1, calculate the force at the end of the electronic iteration. 0 means the force calculation is turned off. It is automatically set to 1 if `calculation` is `cell-relax`, `relax`, or `md`.
 - **Default**: 0
 
@@ -843,7 +844,7 @@ These variables are used to control the output of properties.
 
 ### out_chg
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: If set to 1, ABACUS will output the charge density on real space grid. The name of the density file is SPIN1_CHGCAR and SPIN2_CHGCAR (if nspin = 2). Suppose each density on grid has coordinate (x; y; z). The circle order of the density on real space grid is: z is the outer loop, then y and finally x (x is moving fastest).
 - **Default**: 0
 
@@ -858,7 +859,7 @@ These variables are used to control the output of properties.
 
 ### out_dm
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: If set to 1, ABACUS will output the density matrix of localized orbitals, only useful for localized orbitals set. The name of the output file is SPIN1_DM and SPIN2_DM in the output directory.
 - **Default**: 0
 
@@ -870,13 +871,13 @@ These variables are used to control the output of properties.
 
 ### out_wfc_r
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: Only used in **planewave basis** and **ienvelope calculation in localized orbitals** set. When set this variable to 1, it outputs real-space wave functions into  `OUT.suffix/wfc_realspace/`. The file names are wfc_realspace$K$B, where $K is the index of k point, $B is the index of band.
 - **Default**: 0
 
 ### out_wfc_lcao
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: **Only used in localized orbitals set**. If set to 1, ABACUS will output the wave functions coefficients.
 - **Default**: 0
 
@@ -888,13 +889,13 @@ These variables are used to control the output of properties.
 
 ### out_band
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: Controls whether to output the band structure. For more information, refer to the [worked example](../elec_properties/band.md)
 - **Default**: 0
 
 ### out_proj_band
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: Controls whether to output the projected band structure. For more information, refer to the [worked example](../elec_properties/band.md)
 - **Default**: 0
 
@@ -912,7 +913,7 @@ These variables are used to control the output of properties.
 
 ### out_alllog
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: determines whether to write log from all ranks in an MPI run. If set to be 1, then each rank will write detained running information to a file named running_${calculation}\_(${rank}+1).log. If set to 0, log will only be written from rank 0 into a file named running_${calculation}.log.
 - **Default**: 0
 
@@ -1675,19 +1676,14 @@ These variables are used to control DFT+U correlated parameters
 ### hubbard_u
 
 - **Type**: Real
-- **Description**: Hubbard Coulomb interaction parameter U(ev) in plus U correction, which should be specified for each atom unless Yukawa potential is used. ABACUS uses a simplified scheme that only needs U and J for each atom.
-- **Default**: 0.0
-
-### hund_j
-
-- **Type**: Real
-- **Description**: Hund exchange parameter J(ev) in plus U correction, which should be specified for each atom unless Yukawa potential is used. ABACUS uses a simplified scheme that only needs U and J for each atom.
+- **Description**: Hubbard Coulomb interaction parameter U(ev) in plus U correction, which should be specified for each atom unless Yukawa potential is used.
+> Note : since we only implemented the simplified scheme by Duradev, the 'U' here is actually Ueff which is given by hubbard U minus hund J.
 - **Default**: 0.0
 
 ### yukawa_potential
 
 - **Type**: Boolean
-- **Description**: whether to use the local screen Coulomb potential method to calculate the value of U and J. If this is set to 1, hubbard_u and hund_j do not need to be specified.
+- **Description**: whether to use the local screen Coulomb potential method to calculate the values of U and J. If this is set to 1, hubbard_u does not need to be specified.
 - **Default**: 0
 
 ### yukawa_lambda
@@ -1846,7 +1842,7 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 ### berry_phase
 
-- **Type**: Integer
+- **Type**: Boolean
 - **Description**: 1, calculate berry phase; 0, not calculate berry phase.
 - **Default**: 0
 
@@ -2008,6 +2004,18 @@ These variables are used to control berry phase and wannier90 interface paramete
 
 - **Type**: Boolean
 - **Description**:  If set to 0, then non-local pseudopotential term will not be included in obtaining the Hamiltonian.
+- **Default**: 1
+
+### vh_in_h
+
+- **Type**: Boolean
+- **Description**:  If set to 0, then Hartree potential term will not be included in obtaining the Hamiltonian.
+- **Default**: 1
+
+### vion_in_h
+
+- **Type**: Boolean
+- **Description**:  If set to 0, then local ionic potential term will not be included in obtaining the Hamiltonian.
 - **Default**: 1
 
 ### test_force
