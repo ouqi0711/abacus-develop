@@ -1080,7 +1080,7 @@ bool Input::Read(const std::string &fn)
         }
         else if (strcmp("out_bandgap", word) == 0) // for bandgap printing
         {
-            read_value(ifs, out_bandgap);
+            read_bool(ifs, out_bandgap);
         }
         else if (strcmp("deepks_out_labels", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
         {
