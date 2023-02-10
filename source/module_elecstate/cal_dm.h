@@ -5,7 +5,7 @@
 #include "module_base/timer.h"
 #include "module_base/matrix.h"
 #include "module_base/complexmatrix.h"
-#include "src_lcao/local_orbital_charge.h"
+#include "module_hamilt_lcao/hamilt_lcaodft/local_orbital_charge.h"
 
 namespace elecstate
 {
@@ -80,6 +80,9 @@ inline void cal_dm(const Parallel_Orbitals* ParaV, const ModuleBase::matrix& wg,
         psi::Psi<std::complex<double>> wg_wfc(1, wfc.get_nbands(), wfc.get_nbasis(), nullptr);
         const std::complex<double>* pwfc = wfc.get_pointer();
         std::complex<double>* pwg_wfc = wg_wfc.get_pointer();
+#ifdef _OPENMP
+#pragma omp parallel for schedule(static, 1024)
+#endif
         for(int i = 0;i<wg_wfc.size();++i)
         {
             pwg_wfc[i] = conj(pwfc[i]);

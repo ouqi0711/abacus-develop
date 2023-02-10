@@ -1,27 +1,29 @@
 #include "module_esolver/esolver_ks_lcao.h"
-#include "../src_pw/global.h"
-#include "../src_pw/symmetry_rho.h"
-#include "src_lcao/LCAO_evolve.h"
-#include "src_lcao/dftu.h"
+#include "module_hamilt_pw/hamilt_pwdft/global.h"
+#include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h"
+#include "module_elecstate/module_charge/symmetry_rho.h"
+#include "module_hamilt_lcao/hamilt_lcaodft/hamilt_lcao.h"
+#include "module_hamilt_lcao/module_dftu/dftu.h"
 //
-#include "../module_neighbor/sltk_atom_arrange.h"
-#include "../src_io/istate_charge.h"
-#include "../src_io/istate_envelope.h"
-#include "src_lcao/ELEC_evolve.h"
+#include "module_cell/module_neighbor/sltk_atom_arrange.h"
+#include "module_io/istate_charge.h"
+#include "module_io/istate_envelope.h"
+#include "module_io/write_HS_R.h"
 //
-#include "../src_ri/exx_abfs-jle.h"
-#include "../src_ri/exx_opt_orb.h"
-#include "../src_io/berryphase.h"
-#include "../src_io/to_wannier90.h"
-#include "../module_base/timer.h"
+#include "src_ri/exx_abfs-jle.h"
+#include "src_ri/exx_opt_orb.h"
+#include "module_io/berryphase.h"
+#include "module_io/to_wannier90.h"
+#include "module_base/timer.h"
 #ifdef __DEEPKS
-#include "../module_deepks/LCAO_deepks.h"
+#include "module_hamilt_lcao/module_deepks/LCAO_deepks.h"
 #endif
-#include "../src_pw/H_Ewald_pw.h"
-#include "module_vdw/vdw.h"
-#include "../module_relax/relax_old/variable_cell.h"    // liuyu 2022-11-07
+#include "module_hamilt_general/module_ewald/H_Ewald_pw.h"
+#include "module_hamilt_general/module_vdw/vdw.h"
+#include "module_relax/relax_old/variable_cell.h"    // liuyu 2022-11-07
 
-#include "module_hamilt/ks_lcao/op_exx_lcao.h"
+#include "module_hamilt_lcao/hamilt_lcaodft/operator_lcao/op_exx_lcao.h"
+#include "module_io/dm_io.h"
 
 namespace ModuleESolver
 {
@@ -183,7 +185,7 @@ namespace ModuleESolver
                 std::stringstream ssd;
                 ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
                 // reading density matrix,
-                this->LOC.read_dm(is, ssd.str());
+                ModuleIO::read_dm(is, ssd.str(), this->LOC.DM, this->LOC.DM_R);
             }
 
             // calculate the charge density
@@ -448,8 +450,7 @@ namespace ModuleESolver
             this->LM.allocate_HS_R(this->orb_con.ParaV.nnr);
             this->LM.zeros_HSR('S');
             this->UHM.genH.calculate_S_no(this->LM.SlocR.data());
-            this->output_SR("SR.csr");
-
+            ModuleIO::output_S_R(this->UHM,"SR.csr");
         }
     }
 
@@ -552,6 +553,27 @@ namespace ModuleESolver
             }
             GlobalV::ofs_running << std::endl;
         }
+        if (GlobalV::out_bandgap)
+        {
+            if (!GlobalV::TWO_EFERMI)
+            {
+                GlobalC::en.cal_bandgap(this->pelec);
+                GlobalV::ofs_running << " E_bandgap "
+                << GlobalC::en.bandgap * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+            }
+            else
+            {
+                GlobalC::en.cal_bandgap_updw(this->pelec);
+                GlobalV::ofs_running << " E_bandgap_up " 
+                << GlobalC::en.bandgap_up * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+                GlobalV::ofs_running << " E_bandgap_dw " 
+                << GlobalC::en.bandgap_dw * ModuleBase::Ry_to_eV 
+                << " eV" << std::endl;
+            }
+        
+        }
 
         // add by jingan in 2018.11.7
         if (GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
@@ -567,6 +589,54 @@ namespace ModuleESolver
             bp.Macroscopic_polarization(this->psi);
         }
 
+        //below is for DeePKS NSCF calculation
+#ifdef __DEEPKS
+        const Parallel_Orbitals* pv = this->LOWF.ParaV;
+        if (GlobalV::deepks_out_labels || GlobalV::deepks_scf)
+        {
+            if (GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                GlobalC::ld.cal_projected_DM(this->LOC.dm_gamma[0],
+                                         GlobalC::ucell,
+                                         GlobalC::ORB,
+                                         GlobalC::GridD,
+                                         pv->trace_loc_row,
+                                         pv->trace_loc_col);
+            }
+            else
+            {
+                GlobalC::ld.cal_projected_DM_k(this->LOC.dm_k,
+                                           GlobalC::ucell,
+                                           GlobalC::ORB,
+                                           GlobalC::GridD,
+                                           pv->trace_loc_row,
+                                           pv->trace_loc_col,
+                                           GlobalC::kv.nks,
+                                           GlobalC::kv.kvec_d);
+            }
+            GlobalC::ld.cal_descriptor(); // final descriptor
+            GlobalC::ld.cal_gedm(GlobalC::ucell.nat);
+            if (GlobalV::GAMMA_ONLY_LOCAL)
+            {
+                GlobalC::ld.add_v_delta(GlobalC::ucell,
+                                        GlobalC::ORB,
+                                        GlobalC::GridD,
+                                        pv->trace_loc_row,
+                                        pv->trace_loc_col,
+                                        pv->nrow,
+                                        pv->ncol);
+            }
+            else
+            {
+                GlobalC::ld.add_v_delta_k(GlobalC::ucell, 
+                                          GlobalC::ORB, 
+                                          GlobalC::GridD, 
+                                          pv->trace_loc_row,
+                                          pv->trace_loc_col,
+                                          pv->nnr);
+            }
+        }
+#endif
         return;
     }
 

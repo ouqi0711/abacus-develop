@@ -33,7 +33,6 @@ std::string ESOLVER_TYPE = "ksdft";
 int EFIELD_FLAG = 0; // 5: add electric field
 int DIP_COR_FLAG = 0; // 7: add dipole field
 bool GATE_FLAG = false;    // add gate field
-double NELEC = 0;
 
 std::string DFT_FUNCTIONAL = "default";
 double XC_TEMPERATURE = 0.0;
@@ -58,7 +57,7 @@ int OUT_FREQ_ELEC = 0;
 int OUT_FREQ_ION = 0;
 int RELAX_NMAX = 20;
 int MD_NSTEP = 20;
-int SCF_NMAX = 50;
+int SCF_NMAX = 100;
 
 std::string BASIS_TYPE = "pw"; // xiaohui add 2013-09-01
 std::string KS_SOLVER = "cg"; // xiaohui add 2013-09-01
@@ -93,7 +92,7 @@ double STRESS_THR = 1.0e-2; // LiuXh add 20180515
 
 int ocp = 0;
 std::string ocp_set = "none";
-std::vector<double> ocp_kb(10000);
+std::vector<double> ocp_kb;
 // int ocp_n=0;
 // double ocp_kb[10000];
 int out_mul = 0; // qifeng add 2019/9/10
@@ -168,7 +167,7 @@ int test_energy = 0;
 // for test purpose, skip ewald calculation
 bool test_skip_ewald = false;
 //----------------------------------------------------------
-// src_lcao
+// module_hamilt_lcao/hamilt_lcaodft
 //----------------------------------------------------------
 int test_atom_arrange = 0;
 int test_atom_input = 0;
@@ -237,12 +236,20 @@ int of_full_pw_dim = 0;
 bool of_read_kernel = false;
 std::string of_kernel_file = "WTkernel.txt";
 
-// denghui added for device flag
+//==========================================================
+// device flags added by denghui
+//==========================================================
 std::string device_flag = "unknown";
+//==========================================================
+// precision flags added by denghui
+//==========================================================
+std::string precision_flag = "unknown";
+
 std::string chg_extrap = "";
 int out_pot = 0;
 
 std::string init_chg = "";
 int out_chg = 0;
 double nelec = 0;
+bool out_bandgap = false; // QO added for bandgap printing
 } // namespace GlobalV

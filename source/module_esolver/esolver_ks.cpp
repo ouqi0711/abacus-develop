@@ -1,7 +1,7 @@
 #include "esolver_ks.h"
 #include <iostream>
 #include "time.h"
-#include "../src_io/print_info.h"
+#include "../module_io/print_info.h"
 #ifdef __MPI
 #include "mpi.h"
 #else
@@ -9,10 +9,10 @@
 #endif
 
 //--------------Temporary----------------
-#include "../module_base/global_variable.h"
-#include "../src_pw/global.h"
-#include "../src_pw/charge_mixing.h"
-#include "../module_base/timer.h"
+#include "module_base/global_variable.h"
+#include "module_hamilt_pw/hamilt_pwdft/global.h"
+#include "module_elecstate/module_charge/charge_mixing.h"
+#include "module_base/timer.h"
 //---------------------------------------
 
 namespace ModuleESolver
@@ -293,8 +293,10 @@ namespace ModuleESolver
         return this->niter;
     }
 
+template class ESolver_KS<float, psi::DEVICE_CPU>;
 template class ESolver_KS<double, psi::DEVICE_CPU>;
 #if ((defined __CUDA) || (defined __ROCM))
+template class ESolver_KS<float, psi::DEVICE_GPU>;
 template class ESolver_KS<double, psi::DEVICE_GPU>;
 #endif
 }

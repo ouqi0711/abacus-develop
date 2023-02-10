@@ -25,8 +25,8 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 include Makefile.Objects
 
 VPATH=../module_base\
-:../src_io\
-:../src_pw\
+:../module_io\
+:../module_hamilt_pw/hamilt_pwdft\
 :../src_parallel\
 :./\
 

@@ -12,7 +12,8 @@
 #include "module_elecstate/elecstate.h"
 
 #include "updaterhok_pw_test.h"
-#include "src_io/berryphase.h"
+#include "module_io/berryphase.h"
+#include "module_io/write_wfc_pw.h"
 bool berryphase::berry_phase_flag;
 using::testing::AtLeast;
 using::testing::Assign;
@@ -145,6 +146,7 @@ struct ENVPrepare
     std::string init_wfc_;
     int out_wfc_pw_;
     std::string out_dir_;
+    int prenspin_;
     // default values
     ENVPrepare()
     {
@@ -179,7 +181,8 @@ struct ENVPrepare
         init_chg_ = "atomic";
         init_wfc_ = "atomic";
         out_wfc_pw_ = 1;
-	out_dir_="./support/";
+	    out_dir_="./support/";
+        prenspin_ = 1;
     }
 };
 
@@ -206,8 +209,8 @@ class ENVEnvironment : public ::testing::Environment
         GlobalV::stru_file = env->stru_file_;
         running_log = env->running_log_;
         // INPUT is an object of Input, and declared in input.h
-	GlobalC::ucell.latName = env->latname_;
-	GlobalC::ucell.ntype = env->ntype_;
+	    GlobalC::ucell.latName = env->latname_;
+	    GlobalC::ucell.ntype = env->ntype_;
         // important in pseudo_nc::set_pseudo_atom
         GlobalV::PSEUDORCUT = env->pseudo_rcut_;
         ModuleSymmetry::Symmetry::symm_flag = env->symm_flag_;
@@ -232,8 +235,9 @@ class ENVEnvironment : public ::testing::Environment
         INPUT.cell_factor = env->cell_factor_;
         GlobalV::init_chg = env->init_chg_;
         GlobalC::wf.init_wfc = env->init_wfc_;
-        GlobalC::wf.out_wfc_pw = env->out_wfc_pw_;
-	GlobalV::global_out_dir = env->out_dir_;
+	    GlobalC::wf.out_wfc_pw = env->out_wfc_pw_;
+	    GlobalV::global_out_dir = env->out_dir_;
+        GlobalC::CHR.prenspin = env->prenspin_;
     }
 
     void set_variables_in_set_up(ENVPrepare* envtmp)
@@ -298,7 +302,7 @@ TEST_F(EState,RhoPW)
     GlobalC::wfcpw->initparameters(false, INPUT.ecutwfc, GlobalC::kv.nks, GlobalC::kv.kvec_d.data());
     GlobalC::wfcpw->setuptransform();
     for(int ik = 0 ; ik < GlobalC::kv.nks; ++ik)   GlobalC::kv.ngk[ik] = GlobalC::wfcpw->npwk[ik];
-    exit(0);
+    GlobalC::wfcpw->collect_local_pw();
 
 
     // test the generated fft grid (nx,ny,nz)
@@ -319,6 +323,15 @@ TEST_F(EState,RhoPW)
     ssw <<GlobalV::global_out_dir<< "WAVEFUNC";
     // we need to supply out_wfc_pw here
     read_wfc(ssw.str(), psi[0]);
+
+    INPUT.out_wfc_pw = 2;
+    if (INPUT.out_wfc_pw == 1 || INPUT.out_wfc_pw == 2)
+    {
+        std::stringstream ssw;
+        ssw << "WFC";
+        ModuleIO::write_wfc_pw(ssw.str(), psi[0], &GlobalC::kv, GlobalC::wfcpw);
+	    remove("WFC1.dat");
+    }
 
     // copy data from old wf.evc to new evc(an object of Psi)
     evc.resize(GlobalC::kv.nks,GlobalV::NBANDS,GlobalC::wf.npwx);
@@ -360,7 +373,7 @@ TEST_F(EState,RhoPW)
         rho_for_compare[is] = new double[GlobalC::rhopw->nrxx];
         std::stringstream ssc;
         ssc <<GlobalV::global_out_dir<< "SPIN" << is + 1 << "_CHG";
-        GlobalC::CHR.read_rho(is, ssc.str(), rho_for_compare[is]);
+        ModuleIO::read_rho(is, ssc.str(), rho_for_compare[is],GlobalC::CHR.prenspin);
         for (int ix = 0; ix < GlobalC::rhopw->nrxx; ix++)
         //for (int ix = 0; ix < 5; ix++)
         {

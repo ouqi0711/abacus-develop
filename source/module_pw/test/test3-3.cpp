@@ -103,24 +103,20 @@ TEST_F(PWTEST,test3_3)
     complex<double> * rhog = new complex<double> [npw];
     complex<double> * rhogr = new complex<double> [nmaxgr];
     complex<double> * rhogout = new complex<double> [npw];
-    double sum = 0;
     for(int ig = 0 ; ig < npw ; ++ig)
     {
         rhog[ig] = 1.0/(pwtest.gg[ig]+1);
         rhogr[ig] = 1.0/(pwtest.gg[ig]+1);
-        double a = rhog[ig].real();
         if(pwtest.gdirect[ig].x > 0) 
         {
-            a *= 2;
             rhog[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].y+1) + 1);
             rhogr[ig]+=ModuleBase::IMAG_UNIT / (abs(pwtest.gdirect[ig].y+1) + 1);
         }
-        sum += a;
     }    
     double * rhor = new double [nrxx];
     ModuleBase::GlobalFunc::ZEROS(rhor, nrxx);
 
-    pwtest.recip2real(rhog,rhor,true,1);//check out-of-place transform // test add fft
+    pwtest.recip2real<double>(rhog,rhor,true,1);//check out-of-place transform // test add fft
 
     pwtest.recip2real(rhogr,(double*)rhogr);//check in-place transform
 
@@ -137,7 +133,7 @@ TEST_F(PWTEST,test3_3)
     }
 
     ModuleBase::GlobalFunc::ZEROS(rhogout, npw);
-    pwtest.real2recip(rhor,rhogout,true,1);//check out-of-place transform
+    pwtest.real2recip<double>(rhor,rhogout,true,1);//check out-of-place transform
 
     pwtest.real2recip((double*)rhogr,rhogr);//check in-place transform
 

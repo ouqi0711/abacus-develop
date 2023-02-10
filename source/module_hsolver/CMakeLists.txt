@@ -16,6 +16,21 @@ if(ENABLE_LCAO)
         diago_elpa.cpp
     )
   endif ()
+
+  if(USE_CUSOLVER_LCAO)
+      list(APPEND objects
+          diag_cusolver.cu
+      )
+
+    add_library(
+        diag_cusolver
+        OBJECT
+        ${objects}
+    )
+    if(ENABLE_COVERAGE)
+      add_coverage(diag_cusolver)
+    endif()
+  endif()
 endif()
 
 add_library(
@@ -34,4 +49,5 @@ endif()
 
 IF (BUILD_TESTING)
   add_subdirectory(test)
+  add_subdirectory(kernels/test)
 endif()

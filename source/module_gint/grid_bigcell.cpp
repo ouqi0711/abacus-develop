@@ -1,9 +1,9 @@
 #include "grid_bigcell.h"
-#include "../src_pw/global.h"
+#include "module_hamilt_pw/hamilt_pwdft/global.h"
 
-#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
-#include "../module_base/memory.h"
-#include "../module_base/timer.h"
+#include "module_hamilt_lcao/hamilt_lcaodft/global_fp.h" // mohan add 2021-01-30
+#include "module_base/memory.h"
+#include "module_base/timer.h"
 
 Grid_BigCell::Grid_BigCell()
 {
@@ -181,7 +181,7 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 		delete[] index_atom;
 		this->index_atom = new int[GlobalC::ucell.nat];
 
-		ModuleBase::Memory::record("Grid_BigCell","tau_in_bigcell",GlobalC::ucell.nat*3,"double");
+		ModuleBase::Memory::record("tau_in_bigcell", sizeof(double) * GlobalC::ucell.nat*3);
 	}
 	
 	// get the fraction number of (i,j,k)

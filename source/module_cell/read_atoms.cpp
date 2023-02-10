@@ -6,7 +6,7 @@
 #include "../module_base/constants.h"
 
 #ifndef __CELL
-#include "../src_pw/global.h"
+#include "../module_hamilt_pw/hamilt_pwdft/global.h"
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
@@ -472,7 +472,7 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
 			ModuleBase::GlobalFunc::OUT(ofs_running, "atom label",atoms[it].label);
 
 #ifndef __CMD
-
+			bool set_element_mag_zero = false;
 			ModuleBase::GlobalFunc::READ_VALUE(ifpos, magnet.start_magnetization[it] );
 #endif
 
@@ -606,6 +606,9 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
                                                 }
 												else if ( tmpid == "mag" || tmpid == "magmom")
 												{
+#ifndef __CMD
+													set_element_mag_zero = true;
+#endif
 													double tmpamg=0;
 													ifpos >> tmpamg;
 													tmp=ifpos.get();
@@ -788,6 +791,13 @@ bool UnitCell::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_runn
 					atoms[it].tau_original[ia] = atoms[it].tau[ia];
 				}//endj
 			}// end na
+			//reset some useless parameters
+#ifndef __CMD
+			if(set_element_mag_zero)
+			{
+				magnet.start_magnetization[it] = 0.0;
+			}
+#endif
 		}//end for ntype
 	}// end scan_begin
 

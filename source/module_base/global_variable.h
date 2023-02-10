@@ -33,7 +33,6 @@ extern std::string ESOLVER_TYPE;
 extern int EFIELD_FLAG; // 5 add electric field
 extern int DIP_COR_FLAG; // 7 add dipole correction
 extern bool GATE_FLAG;     // add gate field
-extern double NELEC;
 
 extern std::string DFT_FUNCTIONAL; // 6.5 change the DFT functional from input file.
 extern double XC_TEMPERATURE;
@@ -164,7 +163,7 @@ extern std::string global_out_dir;
 extern std::string global_orbital_dir; // liuyu add 2021-08-14
 extern std::string global_readin_dir; // zhengdy modified
 extern std::string global_stru_dir;   // liuyu add 2022-05-24 for MD STRU
-extern std::string global_matrix_dir; // liuyu add 2022-09-19 for HS matrix output
+extern std::string global_matrix_dir; // liuyu add 2022-09-19 for HS matrix outpu, jiyy modified 2023-01-23 for R matrix output
 
 extern std::ofstream ofs_running;
 extern std::ofstream ofs_warning;
@@ -266,19 +265,22 @@ extern bool of_read_kernel; // If set to 1, the kernel of WT KEDF will be filled
 extern std::string of_kernel_file; // The name of WT kernel file.
 
 //==========================================================
-// device flags
+// device flags added by denghui
 //==========================================================
 extern std::string device_flag;
+//==========================================================
+// precision flags added by denghui
+//==========================================================
+extern std::string precision_flag;
+
 extern std::string chg_extrap;
 extern int out_pot;
 
 extern std::string init_chg; //  output charge if out_chg > 0, and output every "out_chg" elec step.
 extern int out_chg;
 
-//Note : this is different from the capitalized NELEC
-//NELEC gives the total charge of the system
-//while nelec is the total number of valence electrons 
 extern double nelec;
+extern bool out_bandgap;
 
 } // namespace GlobalV
 #endif

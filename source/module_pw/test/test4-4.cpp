@@ -133,13 +133,13 @@ TEST_F(PWTEST,test4_4)
 #endif
 
         ModuleBase::GlobalFunc::ZEROS(rhor, nrxx);
-        pwtest.recip2real(rhog,rhor,ik, true, 1); //check out-of-place transform
+        pwtest.recip2real<double>(rhog,rhor,ik, true, 1); //check out-of-place transform
 
         pwtest.recip2real(rhogr,rhogr,ik); //check in-place transform
 
 #ifdef __MIX_PRECISION
         ModuleBase::GlobalFunc::ZEROS(rhofr, nrxx);
-        pwtest.recip2real(rhofg,rhofr,ik, true, 1); //check out-of-place transform
+        pwtest.recip2real(rhofg,rhofr,ik, true, float(1)); //check out-of-place transform
 
         pwtest.recip2real(rhofgr,rhofgr,ik); //check in-place transform
 #endif
@@ -163,13 +163,13 @@ TEST_F(PWTEST,test4_4)
         }
 
         ModuleBase::GlobalFunc::ZEROS(rhogout, npwk);
-        pwtest.real2recip(rhor,rhogout,ik, true, 1);
+        pwtest.real2recip<double>(rhor,rhogout,ik, true, 1);
 
         pwtest.real2recip(rhogr,rhogr,ik);
 
 #ifdef __MIX_PRECISION
         ModuleBase::GlobalFunc::ZEROS(rhofgout, npwk);
-        pwtest.real2recip(rhofr,rhofgout,ik, true, 1);
+        pwtest.real2recip(rhofr,rhofgout,ik, true, float(1));
 
         pwtest.real2recip(rhofgr,rhofgr,ik);
 #endif
@@ -195,6 +195,12 @@ TEST_F(PWTEST,test4_4)
         delete [] rhofg;
         delete [] rhofgout;
 #endif
+        //check getgcar(ik,ig)
+        for(int igl = 0 ; igl < npwk; ++igl)
+        {
+            EXPECT_NEAR(pwtest.getgcar(ik,igl).norm2(), (pwtest.getgdirect(ik,igl) * G).norm2(), 1e-8);
+            EXPECT_NEAR(pwtest.getgpluskcar(ik,igl).norm2(), ((pwtest.getgdirect(ik,igl) + kvec_d[ik]) * G).norm2(), 1e-8);
+        }
 
         //check igl2ig
         for(int igl = 0; igl < npwk ; ++igl)
@@ -205,6 +211,13 @@ TEST_F(PWTEST,test4_4)
                 if(isz == pwtest.ig2isz[ig]){
                     EXPECT_EQ(ig,pwtest.getigl2ig(ik,igl));}
             }
+        }
+
+        //check getig2ixyz_k
+        pwtest.get_ig2ixyz_k();
+        for(int igl = 0; igl < npwk ; ++igl)
+        { 
+            EXPECT_GE(pwtest.ig2ixyz_k_[igl + ik * pwtest.npwk_max], 0);
         }
 
     }

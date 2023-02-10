@@ -6,8 +6,8 @@ AddTest(
   SOURCES diago_cg_test.cpp ../diago_cg.cpp  ../diago_iter_assist.cpp  
           ../../src_parallel/parallel_reduce.cpp
           ../../src_parallel/parallel_global.cpp ../../module_pw/test/test_tool.cpp
-          ../../module_hamilt/operator.cpp
-          ../../module_hamilt/ks_pw/operator_pw.cpp
+          ../../module_hamilt_general/operator.cpp
+          ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
 )
 AddTest(
   TARGET HSolver_dav
@@ -15,8 +15,8 @@ AddTest(
   SOURCES diago_david_test.cpp ../diago_david.cpp  ../diago_iter_assist.cpp 
           ../../src_parallel/parallel_reduce.cpp ../../src_parallel/parallel_global.cpp  ../../src_parallel/parallel_common.cpp
           ../../module_pw/test/test_tool.cpp
-          ../../module_hamilt/operator.cpp
-          ../../module_hamilt/ks_pw/operator_pw.cpp
+          ../../module_hamilt_general/operator.cpp
+          ../../module_hamilt_pw/hamilt_pwdft/operator_pw/operator_pw.cpp
 )
 
 if(ENABLE_LCAO)
@@ -35,23 +35,6 @@ if(ENABLE_LCAO)
       ../../src_parallel/parallel_common.cpp ../../src_parallel/parallel_reduce.cpp
     )
   endif()
-endif()
-
-AddTest(
-  TARGET Hsolver_UTs
-  LIBS ${math_libs} base device
-  SOURCES math_kernel_test.cpp ../../src_parallel/parallel_global.cpp 
-          ../../src_parallel/parallel_common.cpp  ../../src_parallel/parallel_reduce.cpp
-)
-
-if(USE_CUDA)
-  AddTest(
-    TARGET Dngvd_UTs
-    LIBS ${math_libs} base device
-    SOURCES math_dngvd_test.cpp
-            ../../src_parallel/parallel_global.cpp
-            ../../src_parallel/parallel_common.cpp  ../../src_parallel/parallel_reduce.cpp
-  )
 endif()
 
 install(FILES H-KPoints-Si2.dat DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
